@@ -88,6 +88,8 @@ namespace Tokenizer {
 		return static_cast<TokenType::TokenType>(i);
 
 	if (is_valid_var_name(token_string)) return TokenType::TokenType::TT_VAR;
+
+	if (is_nat(token_string)) return TokenType::TokenType::TT_NUMBER;
 	
 	return TokenType::TokenType::TT_INVALID_ID;
     }
@@ -157,17 +159,15 @@ int is_nat(const char *input_str)
 
 char *to_upper(const char *input_str)
 {
-    int length = strlen(input_str); 
+    int length = std::strlen(input_str); 
     
-    char *output = (char *)malloc(sizeof(char) * (length - 1));
+    char *output = (char *)std::malloc(sizeof(char) * (length));
 
-    for (int i = 0; i < length; ++i) {
-	if (islower(input_str[i]))
-	    output[i] = input_str[i] - 32;
-	else
-	    output[i] = input_str[i];
-    }
+    for (int i = 0; i < length; ++i)
+	output[i] = std::toupper(input_str[i]);
 
+    output[length] = '\0';
+    
     return output;
 }
 
