@@ -7,6 +7,7 @@
 int is_nat(const char *);
 int is_valid_var_name(const char *);
 int is_reserved_word(const char *);
+char *to_upper(const char *);
 
 namespace ReservedWords
 {
@@ -44,21 +45,50 @@ namespace TokenType {
 	TT_BOOL = 11,
 	TT_BEGIN = 12,
 	TT_END = 13,
-	TT_VAR,
-	TT_INVALID_ID
+	TT_DOT = 14,
+	TT_COLON = 15,
+	TT_OPEN_PARENTHESIS = 16,
+	TT_CLOSE_PARENTHESIS = 17,
+	TT_ARROW = 18,
+	TT_VAR = 19,
+	TT_NUMBER = 20,
+	TT_INVALID_ID = 21
+    };
+};
+
+namespace TokenStrings {
+    static const char *token_strings[19] = {
+	"true",
+	"false",
+	"if",
+	"then",
+	"else",
+	"endif",
+	"suc",
+	"pred",
+	"ehzero",
+	"lambda",
+	"Nat",
+	"Bool",
+	"begin",
+	"end",
+	".",
+	":",
+	"(",
+	")",
+	"->"
     };
 };
 
 namespace Tokenizer {
     TokenType::TokenType classify_token(const char *token_string)
     {
-	for (int i = 0; i < 14; ++i)
-	    if (token_string == ReservedWords::reserved_words[i])
+	for (int i = 0; i < 20; ++i)
+	    if (!strcmp(token_string, TokenStrings::token_strings[i]))
 		return static_cast<TokenType::TokenType>(i);
 
-	if (is_valid_var_name(token_string))
-	    return TokenType::TokenType::TT_VAR;
-
+	if (is_valid_var_name(token_string)) return TokenType::TokenType::TT_VAR;
+	
 	return TokenType::TokenType::TT_INVALID_ID;
     }
     
@@ -82,13 +112,34 @@ namespace Tokenizer {
     }
 }
 
+std::ostream& operator<<(std::ostream& cout,TokenType::TokenType token)
+{
+    if (token >= 0 && token <= 13)
+	cout << "<TT_" << to_upper(TokenStrings::token_strings[static_cast<int>(token)]) << ">";
+
+    if (token == TokenType::TokenType::TT_DOT) cout << "<TT_DOT>";
+    if (token == TokenType::TokenType::TT_COLON) cout << "<TT_COLON>";
+    if (token == TokenType::TokenType::TT_OPEN_PARENTHESIS) cout << "<TT_OPEN_PARENTHESIS>";
+    if (token == TokenType::TokenType::TT_CLOSE_PARENTHESIS) cout << "<TT_CLOSE_PARENTHESIS>";
+    if (token == TokenType::TokenType::TT_ARROW) cout << "<TT_ARROW>";
+    if (token == TokenType::TokenType::TT_VAR) cout << "<TT_VAR>";
+    if (token == TokenType::TokenType::TT_NUMBER) cout << "<TT_NUMBER>";
+    if (token == TokenType::TokenType::TT_INVALID_ID) cout << "<TT_INVALID_ID>";
+        
+    return cout;
+}
+
 int main()
 {
-    // std::cout << argc << " " << *argv << '\n';
-    std::cout << ReservedWords::reserved_words[4] << '\n';
-    std::cout << is_valid_var_name("numDePassos") << '\n';
+    char input_str[256];
+    
+    std::cout << "pipipipopopo: ";
+    std::cin.getline(input_str, sizeof(input_str));
 
-    return 0;
+    std::vector<TokenType::TokenType> tokens = Tokenizer::tokenize(input_str);
+
+    for (size_t i = 0; i < tokens.size(); ++i)
+	std::cout << tokens[i] << ' ';
 }
 
 int is_nat(const char *input_str)
@@ -101,6 +152,22 @@ int is_nat(const char *input_str)
     
     return is_nat;
 } 
+
+char *to_upper(const char *input_str)
+{
+    int length = strlen(input_str); 
+    
+    char *output = (char *)malloc(sizeof(char) * (length - 1));
+
+    for (int i = 0; i < length; ++i) {
+	if (islower(input_str[i]))
+	    output[i] = input_str[i] - 32;
+	else
+	    output[i] = input_str[i];
+    }
+
+    return output;
+}
 
 int is_valid_var_name(const char *input_str)
 {
