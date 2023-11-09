@@ -140,6 +140,8 @@ int main()
 
     for (size_t i = 0; i < tokens.size(); ++i)
 	std::cout << tokens[i] << ' ';
+	
+    std::cout << '\n';
 }
 
 int is_nat(const char *input_str)
