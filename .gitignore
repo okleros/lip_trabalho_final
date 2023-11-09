@@ -3,7 +3,8 @@
 *.c
 *.c~
 *.cpp~
-
+main
+teste
 
 # Compiled Object files
 *.slo
