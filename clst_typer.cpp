@@ -4,10 +4,13 @@
 
 // tips: first, tokenize the expression
 
-int is_nat(const char *);
-int is_valid_var_name(const char *);
-int is_reserved_word(const char *);
+bool is_nat(const char *);
+bool is_valid_var_name(const char *);
+bool is_reserved_word(const char *);
 char *to_upper(const char *);
+
+template <typename T>
+std::vector<T> subvector(const std::vector<T>& v, size_t, size_t);
 
 namespace ReservedWords
 {
@@ -55,6 +58,8 @@ namespace TokenType {
 	TT_INVALID_ID = 21
     };
 };
+
+bool is_term(std::vector<TokenType::TokenType>);
 
 namespace TokenStrings {
     static const char *token_strings[19] = {
@@ -104,10 +109,26 @@ namespace Tokenizer {
 	std::vector<TokenType::TokenType> tokens;
 
 	std::stringstream ss(expr);
-	while (ss >> word) {
-	    current_token = classify_token(word);
+	// while (ss >> word) {
+	//     current_token = classify_token(word);
 
-	    tokens.push_back(current_token);
+	//     tokens.push_back(current_token);
+	// }
+	while (true) {
+	    ss.getline(word, sizeof(word), ' ');
+	    
+	    if (*word == '\0' && ss.eof()) {
+		if (expr[strlen(expr) - 1] == ' ') {
+		    current_token = classify_token(" ");
+		    tokens.push_back(current_token);
+		}
+
+		break;
+
+	    } else {
+		current_token = classify_token(word);
+		tokens.push_back(current_token);
+	    }
 	}
 	
 	return tokens;
@@ -163,10 +184,11 @@ int main()
     std::cout << '\n';
 }
 
-int is_nat(const char *input_str)
+bool is_nat(const char *input_str)
 {
     int is_nat = 1;
-    
+
+    if (*input_str == '\0') is_nat = 0;
     while (*input_str != '\0')
         if (!isdigit(*(input_str++)))
             is_nat = 0;
@@ -188,15 +210,16 @@ char *to_upper(const char *input_str)
     return output;
 }
 
-int is_valid_var_name(const char *input_str)
+bool is_valid_var_name(const char *input_str)
 {
     int is_valid = 1;
 
-    // is_valid será 0 se o primeiro dígito for um número ou se a palavra
+    // is_valid será 0 se o primeiro char não for uma letra ou se a palavra
     // for uma das palavras reservadas (vide ReservedWords::reserved_words[])
-    is_valid = !(isdigit(*input_str) || is_reserved_word(input_str));
+    is_valid = !(!isalpha(*input_str) || is_reserved_word(input_str));
 
-    input_str++;    
+    input_str++;
+    // verifica se os chars além do primeiro são alfanuméricos 
     while (*input_str != '\0')
 	if(!isalnum(*(input_str++)))
 	    is_valid = 0;
@@ -204,7 +227,7 @@ int is_valid_var_name(const char *input_str)
     return is_valid;
 }
 
-int is_reserved_word(const char *input_str)
+bool is_reserved_word(const char *input_str)
 {
     int i;
 
@@ -215,3 +238,104 @@ int is_reserved_word(const char *input_str)
     
     return 0;
 }
+
+template <typename T>
+std::vector<T> subvector(const std::vector<T>& v, int start, int end) {
+    if (start >= (int)v.size() || end > (int)v.size())
+        return std::vector<T>();
+
+    if (end < 0)
+	return std::vector<T>(v.begin() + start, v.end());
+    
+    return std::vector<T>(v.begin() + start, v.begin() + end);
+}
+
+int find_end(const std::vector<TokenType::TokenType>& tokens)
+{
+    std::stack<TokenType::TokenType> stack;
+    int i = 0;
+    
+    if (tokens[i] == TokenType::TokenType::TT_IF) {
+	stack.push(TokenType::TokenType::TT_IF);
+	i++;
+	
+	while (!stack.empty()) {
+	    if (tokens[i] == TokenType::TokenType::TT_IF) {
+		stack.push(TokenType::TokenType::TT_IF);
+		i++;
+	    } else {
+		if (tokens[i] == TokenType::TokenType::TT_ENDIF) {
+		    stack.pop();
+		    i++;
+		}
+	    }
+	}
+    }
+    // TODO
+    // if (tokens[0] == TokenType::TokenType::TT_OPEN_PARENTHESIS) {
+    // 	stack.push(TokenType::TokenType::TT_IF);
+    // 	i++;
+	
+    // 	while (!stack.empty()) {
+    // 	    if (tokens[i] == TokenType::TokenType::TT_IF) {
+    // 		stack.push(TokenType::TokenType::TT_IF);
+    // 		i++;
+    // 	    } else {
+    // 		if (tokens[i] == TokenType::TokenType::TT_ENDIF) {
+    // 		    stack.pop();
+    // 		    i++;
+    // 		}
+    // 	    }
+    // 	}
+    // }
+
+    // if (tokens[0] == TokenType::TokenType::TT_LAMBDA) {
+    // 	stack.push(TokenType::TokenType::TT_IF);
+    // 	i++;
+	
+    // 	while (!stack.empty()) {
+    // 	    if (tokens[i] == TokenType::TokenType::TT_IF) {
+    // 		stack.push(TokenType::TokenType::TT_IF);
+    // 		i++;
+    // 	    } else {
+    // 		if (tokens[i] == TokenType::TokenType::TT_ENDIF) {
+    // 		    stack.pop();
+    // 		    i++;
+    // 		}
+    // 	    }
+    // 	}
+    // }
+    
+    return 0;
+}
+
+bool is_term(const std::vector<TokenType::TokenType>& tokens)
+{
+    if (tokens.size() == 1) {
+	switch (tokens[0]) {
+	case ( TokenType::TokenType::TT_TRUE   ):
+	case ( TokenType::TokenType::TT_FALSE  ):
+	case ( TokenType::TokenType::TT_NUMBER ):
+	case ( TokenType::TokenType::TT_SUC    ):
+	case ( TokenType::TokenType::TT_PRED   ):
+	case ( TokenType::TokenType::TT_EHZERO ):
+	case ( TokenType::TokenType::TT_VAR    ):
+	    return 1;
+
+	default:
+	    return 0;
+	}
+    } else {
+	if (tokens[0] == TokenType::TokenType::TT_OPEN_PARENTHESIS) {
+	    int breakpoint = find_end(subvector(tokens, 1, -1));
+
+	    if (breakpoint < 0) return 0;
+	}
+    }
+    
+    return 0;
+}
+
+
+// TODO: implement find_end
+// TODO: finish implementing is_term
