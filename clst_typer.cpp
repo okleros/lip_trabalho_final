@@ -118,16 +118,33 @@ std::ostream& operator<<(std::ostream& cout,TokenType::TokenType token)
 {
     if (token >= 0 && token <= 13)
 	cout << "<TT_" << to_upper(TokenStrings::token_strings[static_cast<int>(token)]) << ">";
-
-    if (token == TokenType::TokenType::TT_DOT) cout << "<TT_DOT>";
-    if (token == TokenType::TokenType::TT_COLON) cout << "<TT_COLON>";
-    if (token == TokenType::TokenType::TT_OPEN_PARENTHESIS) cout << "<TT_OPEN_PARENTHESIS>";
-    if (token == TokenType::TokenType::TT_CLOSE_PARENTHESIS) cout << "<TT_CLOSE_PARENTHESIS>";
-    if (token == TokenType::TokenType::TT_ARROW) cout << "<TT_ARROW>";
-    if (token == TokenType::TokenType::TT_VAR) cout << "<TT_VAR>";
-    if (token == TokenType::TokenType::TT_NUMBER) cout << "<TT_NUMBER>";
-    if (token == TokenType::TokenType::TT_INVALID_ID) cout << "<TT_INVALID_ID>";
-        
+    else
+	switch (token) {
+	case (TokenType::TokenType::TT_DOT):
+	    cout << "<TT_DOT>";
+	    break;
+	case (TokenType::TokenType::TT_COLON):
+	    cout << "<TT_COLON>";
+	    break;
+	case (TokenType::TokenType::TT_OPEN_PARENTHESIS):
+	    cout << "<TT_OPEN_PARENTHESIS>";
+	    break;
+	case (TokenType::TokenType::TT_CLOSE_PARENTHESIS):
+	    cout << "<TT_CLOSE_PARENTHESIS>";
+	    break;
+	case (TokenType::TokenType::TT_ARROW):
+	    cout << "<TT_ARROW>";
+	    break;
+	case (TokenType::TokenType::TT_VAR):
+	    cout << "<TT_VAR>";
+	    break;
+	case (TokenType::TokenType::TT_NUMBER):
+	    cout << "<TT_NUMBER>";
+	    break;
+	default:
+	    cout << "<TT_INVALID_ID>";
+	}
+    
     return cout;
 }
 
