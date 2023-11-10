@@ -11,7 +11,7 @@ char *to_upper(const char *);
 
 namespace ReservedWords
 {
-    static const char *reserved_words[14] = {
+    static const char *reserved_words[] = {
 	"true",
 	"false",
 	"if",
