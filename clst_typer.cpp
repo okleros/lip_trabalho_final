@@ -3,7 +3,6 @@
 #include <bits/stdc++.h>
 
 // tips: first, tokenize the expression
-
 bool is_nat(const char *);
 bool is_valid_var_name(const char *);
 bool is_reserved_word(const char *);
@@ -194,7 +193,7 @@ bool is_nat(const char *input_str)
             is_nat = 0;
     
     return is_nat;
-} 
+}
 
 char *to_upper(const char *input_str)
 {
