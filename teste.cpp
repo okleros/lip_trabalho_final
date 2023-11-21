@@ -1,40 +1,6 @@
 #include <iostream>
 
-enum TypeType {
-    NAT,
-    BOOL
-};
-
-const char *types_string[2] = {"Nat", "Bool"};
-
-struct type_ll
-{
-    TypeType type;
-    type_ll *next_type;
-
-    type_ll(TypeType tp) : type(tp), next_type(nullptr) {};
-    
-};
-
-void add_type(type_ll *input_type, type_ll *type_to_add)
-{
-    while (input_type->next_type != nullptr)
-	input_type++;
-
-    input_type->next_type = type_to_add;   
-}
-
-void print_type(type_ll *input_type)
-{
-    if (input_type->next_type == nullptr) {
-	std::cout << types_string[input_type->type];
-    } else {
-	std::cout << "( " << types_string[input_type->type] << " -> ";
-	print_type(input_type->next_type);
-	std::cout << " )";
-    }
-    
-}
+#include "types.hpp"
 
 int main()
 {
