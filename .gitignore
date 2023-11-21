@@ -1,8 +1,7 @@
 # Prerequisites
 *.d
 *.c
-*.c~
-*.cpp~
+*~
 main
 teste
 
