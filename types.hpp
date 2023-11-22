@@ -2,6 +2,8 @@
 #define TYPES_HPP
 
 #include <iostream>
+#include <bits/stdc++.h>
+#include <cstring>
 
 enum TypeType {
     NAT,
@@ -20,6 +22,50 @@ struct type_ll
 
     type_ll()            : type(INV_TYPE), next_type(nullptr) {}
     type_ll(TypeType tp) : type(tp), next_type(nullptr) {}
+    type_ll(const char *type_string)
+    {
+	char word[32];
+
+	std::stringstream ss(type_string);
+
+	ss.getline(word, sizeof(word), ' ');
+
+	if (!strcmp(word, "("))
+	    type = LPAREN;
+
+	if (!strcmp(word, ")"))
+	    type = RPAREN;
+
+	if (!strcmp(word, "Nat"))
+	    type = NAT;
+
+	if (!strcmp(word, "Bool"))
+	    type = BOOL;
+
+	type_ll *pp = this;
+	
+	while (!ss.eof()) {
+	    ss.getline(word, sizeof(word), ' ');
+
+	    if (!strcmp(word, "("))
+		pp->next_type = new type_ll(LPAREN);
+
+	    else if (!strcmp(word, ")"))
+		pp->next_type = new type_ll(RPAREN);
+
+	    else if (!strcmp(word, "Nat"))
+		pp->next_type = new type_ll(NAT);
+
+	    else if (!strcmp(word, "Bool"))
+		pp->next_type = new type_ll(BOOL);
+
+	    else
+		continue;
+	    
+	    pp = pp->next_type;
+	}
+	
+    }
     ~type_ll() { delete this; }
     
 };
@@ -49,7 +95,13 @@ void add_type(type_ll **input_type, type_ll *type_to_add)
 	aux = aux->next_type;
 
     aux->next_type = type_to_add;
-    type_to_add->next_type = rp;
+
+    aux = type_to_add;
+
+    while (aux->next_type != nullptr)
+	aux = aux->next_type;
+    
+    aux->next_type = rp;
         
 }
 
@@ -62,7 +114,10 @@ void print_type(type_ll *input_type)
 	    std::cout << types_string[input_type->type];
 
     else {
-	std::cout << types_string[input_type->type];
+	if (input_type->type != LPAREN && input_type->next_type->type != RPAREN)
+	    std::cout << types_string[input_type->type] << " -> ";
+	else
+	    std::cout << types_string[input_type->type];
 	
 	if (input_type->next_type != nullptr)
 	    print_type(input_type->next_type);
