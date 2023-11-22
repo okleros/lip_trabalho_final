@@ -10,17 +10,17 @@
 #include "reserved_words.hpp"
 #include "types.hpp"
 
-char *to_upper(const char *);
+char *to_upper(const char *input_str);
 
-bool is_nat(const char *);
-bool is_valid_var_name(const char *);
-bool is_reserved_word(const char *);
-bool is_term(const std::vector<TokenType>&);
-bool has_invalid_id(const std::vector<TokenType>&);
+bool is_nat(const char *input_str);
+bool is_valid_var_name(const char *input_str);
+bool is_reserved_word(const char *input_str);
+bool is_term(const std::vector<TokenType>& tokens);
+bool has_invalid_id(const std::vector<TokenType>& tokens);
 
-int find_end(const std::vector<TokenType>&);
+int find_end(const std::vector<TokenType>& tokens);
 
-type_ll* infer_type(const std::vector<TokenType>&);
+type_ll* infer_type(const std::vector<TokenType>& tokens);
 
 template <typename T>
 std::vector<T> subvector(const std::vector<T>& v, int start, int end);
