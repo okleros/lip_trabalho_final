@@ -6,17 +6,21 @@
 enum TypeType {
     NAT,
     BOOL,
-    INV_TYPE,
+    LPAREN,
+    RPAREN,
+    INV_TYPE
 };
 
-const char *types_string[2] = {"Nat", "Bool"};
+const char *types_string[4] = {"Nat", "Bool", "( ", " )"};
 
 struct type_ll
 {
     TypeType type;
     type_ll *next_type;
 
-    type_ll(TypeType tp) : type(tp), next_type(nullptr) {};
+    type_ll()            : type(INV_TYPE), next_type(nullptr) {}
+    type_ll(TypeType tp) : type(tp), next_type(nullptr) {}
+    ~type_ll() { delete this; }
     
 };
 
@@ -29,26 +33,39 @@ struct var_type
 void add_type(type_ll *input_type, type_ll *type_to_add);
 void print_type(type_ll *input_type);
 bool has_invalid_type(type_ll *input_type);
+bool is_composed_type(type_ll *input_type);
 
-void add_type(type_ll *input_type, type_ll *type_to_add)
+void add_type(type_ll **input_type, type_ll *type_to_add)
 {
-    while (input_type->next_type != nullptr)
-	input_type++;
+    type_ll *lp = new type_ll(LPAREN);
+    type_ll *rp = new type_ll(RPAREN);
 
-    input_type->next_type = type_to_add;   
+    lp->next_type = *input_type;
+    *input_type = lp;
+
+    type_ll *aux = *input_type;
+    
+    while (aux->next_type != nullptr)
+	aux = aux->next_type;
+
+    aux->next_type = type_to_add;
+    type_to_add->next_type = rp;
+        
 }
 
 void print_type(type_ll *input_type)
 {
-    if (has_invalid_type(input_type)) std::cout << "-";
-    
-    if (input_type->next_type == nullptr) {
-	std::cout << types_string[input_type->type];
+    if (has_invalid_type(input_type))
+	std::cout << "-";
 
-    } else {
-	std::cout << "( " << types_string[input_type->type] << " -> ";
-	print_type(input_type->next_type);
-	std::cout << " )";
+    else if (input_type->next_type == nullptr)
+	    std::cout << types_string[input_type->type];
+
+    else {
+	std::cout << types_string[input_type->type];
+	
+	if (input_type->next_type != nullptr)
+	    print_type(input_type->next_type);
     }
 }
 
@@ -64,6 +81,11 @@ bool has_invalid_type(type_ll *input_type)
     }
 
     return 0;
+}
+
+bool is_composed_type(type_ll *input_type)
+{
+    return !(input_type->next_type = nullptr);
 }
 
 #endif // TYPES_HPP

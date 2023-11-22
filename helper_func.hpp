@@ -20,7 +20,7 @@ bool has_invalid_id(const std::vector<TokenType>&);
 
 int find_end(const std::vector<TokenType>&);
 
-type_ll infer_type(const std::vector<TokenType>&);
+type_ll* infer_type(const std::vector<TokenType>&);
 
 template <typename T>
 std::vector<T> subvector(const std::vector<T>& v, int start, int end);
@@ -187,6 +187,9 @@ bool is_reserved_word(const char *input_str)
 // TODO: TYPE INFERENCE
 int find_end(const std::vector<TokenType>& tokens, const TokenType& push_token, const TokenType& pop_token)
 {
+    (void)push_token;
+    (void)pop_token;
+
     std::stack<TokenType> stack;
     int i = 0;
     
@@ -254,30 +257,46 @@ type_ll *infer_type(const std::vector<TokenType>& tokens, const std::vector<var_
     if (tokens.size() == 1) {
 	switch (tokens[0]) {
 	case ( TT_TRUE   ):
-	    
 	case ( TT_FALSE  ):
+	    tipo_um->type = BOOL;
+	    delete tipo_dois;
+	    return tipo_um;
 
 	case ( TT_NUMBER ):
+	    tipo_um->type = NAT;
+	    delete tipo_dois;
+	    return tipo_um;
 
 	case ( TT_SUC    ):
-
 	case ( TT_PRED   ):
+	    tipo_um->type = NAT;
+	    tipo_dois->type = NAT;
+	    add_type(&tipo_um, tipo_dois);
+	    return tipo_um;
 
 	case ( TT_EHZERO ):
+	    tipo_um->type = NAT;
+	    tipo_dois->type = BOOL;
+	    add_type(&tipo_um, tipo_dois);
+	    return tipo_um;
 
 	case ( TT_VAR    ):
+	    // contexto
 
 	default:
-	    return type_ll(NAT);
+	    return new type_ll;
 	}
     } else {
-	return type_ll(NAT);
+	return new type_ll;
 	if (tokens[0] == TT_LPAREN) {
 	    int breakpoint = find_end(subvector(tokens, 1, -1));
 
 	    if (breakpoint < 0) return 0;
 	}
     }
+
+    delete tipo_um;
+    delete tipo_dois;
 };
 
 #endif // HELPER_FUNC_HPP

@@ -27,7 +27,7 @@ int main()
 	// indefinido, automaticamente printamos "-", caso contrário, vamos
 	// printar o tipo completo do termo
 	print_type(expr_type);
-    
+	std::cout << '\n';
 	// debug 
 	// for (size_t i = 0; i < tokens.size(); ++i)
 	//     std::cout << tokens[i] << ' ';
