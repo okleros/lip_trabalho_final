@@ -258,10 +258,8 @@ type_ll *infer_type(const std::vector<TokenType>& tokens, const std::vector<var_
 	switch (tokens[0]) {
 	case ( TT_TRUE   ):
 	case ( TT_FALSE  ):
-	    tipo_um->type = BOOL;
-	    delete tipo_dois;
-	    return tipo_um;
-
+	    return new type_ll("Bool");
+	    
 	case ( TT_NUMBER ):
 	    tipo_um->type = NAT;
 	    delete tipo_dois;
