@@ -22,6 +22,7 @@ struct type_ll
 
     type_ll()            : type(INV_TYPE), next_type(nullptr) {}
     type_ll(TypeType tp) : type(tp), next_type(nullptr) {}
+    type_ll(type_ll *other) : type(other->type), next_type(nullptr) {};
     type_ll(const char *type_string)
     {
 	char word[32];
@@ -128,19 +129,14 @@ bool has_invalid_type(type_ll *input_type)
 {
     type_ll *tp = input_type;
 
-    while (tp->next_type) {
+    while (tp) {
 	if (tp->type == INV_TYPE)
-	    return 0;
+	    return 1;
 	
 	tp = tp->next_type;
     }
 
     return 0;
-}
-
-bool is_composed_type(type_ll *input_type)
-{
-    return !(input_type->next_type = nullptr);
 }
 
 #endif // TYPES_HPP

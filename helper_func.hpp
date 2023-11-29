@@ -15,10 +15,10 @@ char *to_upper(const char *input_str);
 bool is_nat(const char *input_str);
 bool is_valid_var_name(const char *input_str);
 bool is_reserved_word(const char *input_str);
-bool is_term(const std::vector<TokenType>& tokens);
-bool has_invalid_id(const std::vector<TokenType>& tokens);
+bool is_term(const std::vector<Token>& tokens);
+bool has_invalid_id(const std::vector<Token>& tokens);
 
-int find_end(const std::vector<TokenType>& tokens);
+int find_end(const std::vector<Token>& tokens, const TokenType &push_token, const TokenType &pop_token);
 
 type_ll* infer_type(const std::vector<TokenType>& tokens);
 
@@ -43,10 +43,10 @@ char *to_upper(const char *input_str)
     return output;
 }
 
-bool has_invalid_id(const std::vector<TokenType>& tokens)
+bool has_invalid_id(const std::vector<Token>& tokens)
 {
-    for (TokenType token : tokens)
-	if (token == TT_INVALID_ID)
+    for (Token token : tokens)
+	if (token.type == TT_INVALID_ID)
 	    return 1;
         
     return 0;
@@ -100,12 +100,12 @@ std::ostream& operator << (std::ostream& cout, TokenType token)
     return cout;
 }
 
-bool is_term(const std::vector<TokenType>& tokens)
+bool is_term(const std::vector<Token>& tokens)
 {
     if (has_invalid_id(tokens)) return 0;
 
     if (tokens.size() == 1) {
-	switch (tokens[0]) {
+	switch (tokens[0].type) {
 	case ( TT_TRUE   ):
 	case ( TT_FALSE  ):
 	case ( TT_NUMBER ):
@@ -120,8 +120,8 @@ bool is_term(const std::vector<TokenType>& tokens)
 	}
     } else {
 	return 0;
-	if (tokens[0] == TT_LPAREN) {
-	    int breakpoint = find_end(subvector(tokens, 1, -1));
+	if (tokens[0].type == TT_LPAREN) {
+	    int breakpoint = find_end(subvector(tokens, 1, -1), TT_LPAREN, TT_RPAREN);
 
 	    if (breakpoint < 0) return 0;
 	}
@@ -185,7 +185,7 @@ bool is_reserved_word(const char *input_str)
 }
 
 // TODO: TYPE INFERENCE
-int find_end(const std::vector<TokenType>& tokens, const TokenType& push_token, const TokenType& pop_token)
+int find_end(const std::vector<Token>& tokens, const TokenType& push_token, const TokenType& pop_token)
 {
     (void)push_token;
     (void)pop_token;
@@ -193,16 +193,16 @@ int find_end(const std::vector<TokenType>& tokens, const TokenType& push_token, 
     std::stack<TokenType> stack;
     int i = 0;
     
-    if (tokens[i] == TT_IF) {
+    if (tokens[i].type == TT_IF) {
 	stack.push(TT_IF);
 	i++;
 	
 	while (!stack.empty()) {
-	    if (tokens[i] == TT_IF) {
+	    if (tokens[i].type == TT_IF) {
 		stack.push(TT_IF);
 		i++;
 	    } else {
-		if (tokens[i] == TT_ENDIF) {
+		if (tokens[i].type == TT_ENDIF) {
 		    stack.pop();
 		    i++;
 		}
@@ -247,55 +247,46 @@ int find_end(const std::vector<TokenType>& tokens, const TokenType& push_token, 
     return 0;
 }
 
-type_ll *infer_type(const std::vector<TokenType>& tokens, const std::vector<var_type> context)
+type_ll *infer_type(const std::vector<Token>& tokens, const std::vector<var_type> context)
 {
     (void)context;
 
-    type_ll *tipo_um = new type_ll;
-    type_ll *tipo_dois = new type_ll;
-    
     if (tokens.size() == 1) {
-	switch (tokens[0]) {
+	switch (tokens[0].type) {
 	case ( TT_TRUE   ):
 	case ( TT_FALSE  ):
 	    return new type_ll("Bool");
 	    
 	case ( TT_NUMBER ):
-	    tipo_um->type = NAT;
-	    delete tipo_dois;
-	    return tipo_um;
+	    return new type_ll("Nat");
 
 	case ( TT_SUC    ):
 	case ( TT_PRED   ):
-	    tipo_um->type = NAT;
-	    tipo_dois->type = NAT;
-	    add_type(&tipo_um, tipo_dois);
-	    return tipo_um;
+	    return new type_ll("( Nat -> Nat )");
 
 	case ( TT_EHZERO ):
-	    tipo_um->type = NAT;
-	    tipo_dois->type = BOOL;
-	    add_type(&tipo_um, tipo_dois);
-	    return tipo_um;
+	    return new type_ll("( Nat -> Bool )");
 
 	case ( TT_VAR    ):
-	    // contexto
+	    for (var_type v : context) {
+		if (!strcmp(tokens[0].token_string, v.var_name))
+		    return new type_ll(v.type);
+	    }
+	    
+	    return new type_ll();
 
 	default:
 	    return new type_ll;
 	}
     } else {
 	return new type_ll;
-	if (tokens[0] == TT_LPAREN) {
-	    int breakpoint = find_end(subvector(tokens, 1, -1));
+	if (tokens[0].type == TT_LPAREN) {
+	    int breakpoint = find_end(subvector(tokens, 1, -1), TT_LPAREN, TT_RPAREN);
 
 	    if (breakpoint < 0) return 0;
 	}
     }
 
-    delete tipo_um;
-    delete tipo_dois;
 };
 
 #endif // HELPER_FUNC_HPP
-

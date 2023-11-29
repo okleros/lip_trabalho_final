@@ -1,6 +1,8 @@
 #ifndef TOKENS_HPP
 #define TOKENS_HPP
 
+#include <cstring>
+
 enum TokenType {
     TT_TRUE,
     TT_FALSE,
@@ -24,6 +26,17 @@ enum TokenType {
     TT_VAR,
     TT_NUMBER,
     TT_INVALID_ID
+};
+
+struct Token
+{
+    TokenType type;
+    char token_string[32];
+
+    Token(const TokenType &t = TT_INVALID_ID, const char *token_string = "") {
+	type = t;
+	strcpy(this->token_string, token_string);
+    }
 };
 
 const char *token_strings[19] = {

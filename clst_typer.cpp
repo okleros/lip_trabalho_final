@@ -11,7 +11,7 @@ int main()
 
     std::cin.getline(input_str, sizeof(input_str));
 
-    std::vector<TokenType> tokens = Tokenizer::tokenize(input_str);
+    std::vector<Token> tokens = Tokenizer::tokenize(input_str);
 
     // se a expressão digitada não for exatamente um termo, printamos "!"
     if (!is_term(tokens)) {
