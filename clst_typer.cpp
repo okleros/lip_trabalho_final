@@ -13,8 +13,14 @@ int main()
 
     std::vector<Token> tokens = Tokenizer::tokenize(input_str);
 
+    // for (const Token& token : subvector(tokens, 1, find_end(tokens, TT_IF, TT_THEN))) {
+    // 	std::cout << token.type << " ";
+    // }
+
+    // std::cout << '\n';
+
     // se a expressão digitada não for exatamente um termo, printamos "!"
-    if (!is_term(tokens)) {
+    if (0/*!is_term(tokens)*/) {
 	std::cout << "!" << '\n'; 
 
     } else {

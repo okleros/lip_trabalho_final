@@ -67,6 +67,23 @@ struct type_ll
 	}
 	
     }
+
+    bool operator == (const type_ll& type_two) {
+	const type_ll *p1 = this;
+	const type_ll *p2 = &type_two;
+
+	while (p1 && p2) {
+	    if (p1->type != p2->type) {
+		return 0;
+	    }
+
+	    p1 = p1->next_type;
+	    p2 = p2->next_type;
+	}
+
+	return (!(p1 || p2));
+    }
+    
     ~type_ll() { delete this; }
     
 };
